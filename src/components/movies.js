@@ -13,6 +13,7 @@ class Movies extends Component {
     genres: [],
     currentPage: 1,
     pageSize: 4,
+    sortColumn: { path: "title", order: "asc" },
   };
 
   componentDidMount() {
@@ -42,7 +43,14 @@ class Movies extends Component {
   };
 
   handleSort = (path) => {
-    console.log(path);
+    const sortColumn = { ...this.state.sortColumn };
+    if (sortColumn.path === path)
+      sortColumn.order = sortColumn.order === "asc" ? "desc" : "asc";
+    else {
+      sortColumn.path = path;
+      sortColumn.order = "asc";
+    }
+    this.setState({ sortColumn });
   };
 
   render() {
@@ -50,6 +58,7 @@ class Movies extends Component {
     const {
       currentPage,
       pageSize,
+      sortColumn,
       selectedGenre,
       movies: allMovies,
       genres,
@@ -61,7 +70,10 @@ class Movies extends Component {
       selectedGenre && selectedGenre._id
         ? allMovies.filter((movie) => movie.genre._id === selectedGenre._id)
         : allMovies;
-    const movies = paginate(filtered, currentPage, pageSize);
+
+    const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
+
+    const movies = paginate(sorted, currentPage, pageSize);
 
     return (
       <React.Fragment>
