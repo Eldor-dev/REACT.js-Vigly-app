@@ -42,10 +42,20 @@ class Movies extends Component {
 
   render() {
     const { length: count } = this.state.movies;
-    const { currentPage, pageSize, movies: allMovies, genres } = this.state;
+    const {
+      currentPage,
+      pageSize,
+      selectedGenre,
+      movies: allMovies,
+      genres,
+    } = this.state;
 
     if (count === 0) return <p>There are no movies in the database.</p>;
-    const movies = paginate(allMovies, currentPage, pageSize);
+
+    const filtered = selectedGenre
+      ? allMovies.filter((movie) => movie.genre._id === selectedGenre._id)
+      : allMovies;
+    const movies = paginate(filtered, currentPage, pageSize);
 
     return (
       <React.Fragment>
@@ -53,12 +63,12 @@ class Movies extends Component {
           <div className="col-2">
             <ListGroup
               items={genres}
-              selectedItem={this.state.selectedGenre}
+              selectedItem={selectedGenre}
               onItemSelect={this.handleGenreSelect}
             />
           </div>
           <div className="col">
-            <p>Showing {count} movies in the database.</p>
+            <p>Showing {filtered.length} movies in the database.</p>
             <table className="table">
               <thead>
                 <tr>
